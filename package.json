@@ -16,9 +16,9 @@
   "author": "Trek10",
   "license": "SEE LICENSE IN LICENSE.txt",
   "dependencies": {
+    "bluebird": "^3.5.0",
     "is-valid-json": "^1.0.2",
     "yamljs": "^0.2.10",
-    "bluebird": "^3.0.6",
     "lodash": "^4.17.4"
   },
   "bin": {

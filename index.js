@@ -9,8 +9,12 @@ const path = require('path'),
 
 class CloudFormationGraph {
   constructor(options) {
-    this.options = options;
+    this.options = {
+      horizontal: false,
+      edgelabels: false
+    };
 
+    _.merge(this.options, options)
     // this.commands = {
     //   graph: {
     //     usage: "Creates graphviz compatible graph output of nodes and edges. Saves to graph.out file.",
@@ -47,12 +51,11 @@ class CloudFormationGraph {
 
     // If JSON string and valid, pass right through
     if (isJSON(incomingStringOrFile)) {
-      console.log('Processing incoming string as JSON');
       template = JSON.parse(incomingStringOrFile);
     }
 
     // If valid yaml, pull to template object
-    if (!template.length > 0) {
+    if (!template) {
       try {
         template = YAML.parse(incomingStringOrFile);
       } catch (e) {
@@ -62,11 +65,11 @@ class CloudFormationGraph {
       }
     }
 
-    var obj = lib.extractGraph(template.Description, template.Resources, serverless)
+    var obj = lib.extractGraph(template.Description, template.Resources)
     var graph = obj.graph;
     graph.edges = graph.edges.concat(obj.edges);
     lib.handleTerminals(template, graph, 'Parameters', 'source')
-    lib.renderGraph(graph, options)
+    return lib.renderGraph(graph, options)
   }
 }
 

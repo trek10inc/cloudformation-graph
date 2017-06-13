@@ -3,7 +3,7 @@
 'use strict';
 
 const CloudFormationGraph = require('../index.js');
-const fs=require('fs');
+const fs = require('fs');
 
 process.on('unhandledRejection', (e) => {
   console.error(e);
@@ -11,58 +11,69 @@ process.on('unhandledRejection', (e) => {
 
 process.noDeprecation = true;
 
-if(['--help', '-h', 'help'].indexOf(process.argv[2]) >=0){
+if (['--help', '-h', 'help'].indexOf(process.argv[2]) >= 0) {
   console.log(`
 CloudFormation Graph
 ============================================================
 Usage Examples:
 
-cfn-grah path-to-file.json
-cfn-graph 'VALID_JSON_TEMPALTE'
+cfn-grah path-to-file.json [--horizontal|-h] [--edgelabels|-e]
+cfn-graph 'VALID_JSON_TEMPALTE' [--horizontal|-h] [--edgelabels|-e]
 
-cfn-grah path-to-file.yaml     (expiremental) 
-cfn-graph 'VALID_YML_TEMPLATE' (expiremental) 
+# IT IS A KNOWN PROBLEM THAT !Sub or !Ref syntax is not supported
+cfn-grah path-to-file.yaml     (expiremental) [--horizontal|-h] [--edgelabels|-e]
+cfn-graph 'VALID_YML_TEMPLATE' (expiremental) [--horizontal|-h] [--edgelabels|-e]
 
-cat template | cfg
+cat template.json | cfg [--horizontal|-h] [--edgelabels|-e]
 `)
+  return;
 }
 
+let options = {};
+
+// MAD HACKS
+if (process.argv.join('~~').indexOf('~~--h') >= 0 || process.argv.join('~~').indexOf('~~-h') >= 0) {
+  options.horizontal = true;
+};
+
+if (process.argv.join('~~').indexOf('~~--e') >= 0 || process.argv.join('~~').indexOf('~~-e') >= 0) {
+  options.edgelabels = true;
+};
+
 // parse options
-const cfg = new CloudFormationGraph();
+const cfg = new CloudFormationGraph(options);
 
 var data = '';
 function withPipe(data) {
-   console.log('content was piped');
-   console.log(data.trim());
+  console.log(data.trim());
 }
 function withoutPipe() {
-   console.log('no content was piped');
-   return;
+  return;
 }
 
 var readIn = process.stdin;
 var countChunks = 0;
 var notStdIn = false;
 
-readIn.on('readable', function() {
-    var chunk = this.read();
-    if (chunk === null) {
-      if(countChunks==0){
-        notStdIn = true;
-        countChunks++;
-        withoutPipe();
-        readIn.push(null);
-      }
-    } else {
-       countChunks++;
-       data += chunk;
+readIn.on('readable', function () {
+  var chunk = this.read();
+  if (chunk === null) {
+    if (countChunks == 0) {
+      notStdIn = true;
+      countChunks++;
+      withoutPipe();
+      readIn.push(null);
     }
+  } else {
+    countChunks++;
+    data += chunk;
+  }
 });
 
-readIn.on('end', function() {
-  if(!notStdIn){
-    cfg.graph(data);
+readIn.on('end', function () {
+  if (!notStdIn) {
+    process.stdout.write(cfg.graph(data));
   } else {
-    cfg.graph(process.argv[2]);
+    process.stdout.write(cfg.graph(process.argv[2]));
   }
 });
