@@ -3,9 +3,66 @@
 'use strict';
 
 const CloudFormationGraph = require('../index.js');
+const fs=require('fs');
 
 process.on('unhandledRejection', (e) => {
   console.error(e);
 });
 
 process.noDeprecation = true;
+
+if(['--help', '-h', 'help'].indexOf(process.argv[2]) >=0){
+  console.log(`
+CloudFormation Graph
+============================================================
+Usage Examples:
+
+cfn-grah path-to-file.json
+cfn-graph 'VALID_JSON_TEMPALTE'
+
+cfn-grah path-to-file.yaml     (expiremental) 
+cfn-graph 'VALID_YML_TEMPLATE' (expiremental) 
+
+cat template | cfg
+`)
+}
+
+// parse options
+const cfg = new CloudFormationGraph();
+
+var data = '';
+function withPipe(data) {
+   console.log('content was piped');
+   console.log(data.trim());
+}
+function withoutPipe() {
+   console.log('no content was piped');
+   return;
+}
+
+var readIn = process.stdin;
+var countChunks = 0;
+var notStdIn = false;
+
+readIn.on('readable', function() {
+    var chunk = this.read();
+    if (chunk === null) {
+      if(countChunks==0){
+        notStdIn = true;
+        countChunks++;
+        withoutPipe();
+        readIn.push(null);
+      }
+    } else {
+       countChunks++;
+       data += chunk;
+    }
+});
+
+readIn.on('end', function() {
+  if(!notStdIn){
+    cfg.graph(data);
+  } else {
+    cfg.graph(process.argv[2]);
+  }
+});

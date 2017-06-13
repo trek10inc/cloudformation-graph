@@ -17,6 +17,13 @@
   "license": "SEE LICENSE IN LICENSE.txt",
   "dependencies": {
     "is-valid-json": "^1.0.2",
-    "yamljs": "^0.2.10"
+    "yamljs": "^0.2.10",
+    "bluebird": "^3.0.6",
+    "lodash": "^4.17.4"
+  },
+  "bin": {
+    "cloudformation-graph": "./bin/cfn-graph",
+    "cfn-graph": "./bin/cfn-graph",
+    "cfg": "./bin/cfn-graph"
   }
 }
