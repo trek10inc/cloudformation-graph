@@ -52,7 +52,7 @@ class CloudFormationGraph {
     }
 
     // If valid yaml, pull to template object
-    if (!template.length > 0) {
+    if (!template) {
       try {
         template = YAML.parse(incomingStringOrFile);
       } catch (e) {
@@ -62,11 +62,12 @@ class CloudFormationGraph {
       }
     }
 
-    var obj = lib.extractGraph(template.Description, template.Resources, serverless)
+    var obj = lib.extractGraph(template.Description, template.Resources)
     var graph = obj.graph;
     graph.edges = graph.edges.concat(obj.edges);
     lib.handleTerminals(template, graph, 'Parameters', 'source')
-    lib.renderGraph(graph, options)
+    console.log(options)
+    return lib.renderGraph(graph, options)
   }
 }
 
