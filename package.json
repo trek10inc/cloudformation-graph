@@ -1,0 +1,14 @@
+{
+  "name": "cloudformation-graph",
+  "version": "1.0.0",
+  "description": "Generate dot files for GraphViz from an AWS CloudFormation template.",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Trek10",
+  "license": "SEE LICENSE IN LICENSE.txt"
+}
