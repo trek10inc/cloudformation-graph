@@ -1,78 +1,73 @@
 'use strict';
 
-const path    = require('path'),
-    fs        = require('fs'),
-    BbPromise = require('bluebird'),
-    lib       = require('./lib'),
-    _         = require('lodash');
+const path = require('path'),
+  fs = require('fs'),
+  BbPromise = require('bluebird'),
+  lib = require('./lib'),
+  _ = require('lodash'),
+  isJSON = require('is-valid-json');
 
-class ServerlessGraph {
-  constructor(serverless, options) {
-    this.serverless = serverless;
+class CloudFormationGraph {
+  constructor(options) {
     this.options = options;
 
-    // set the providers name here
-    this.provider = this.serverless.getProvider('providerName');
-
-    this.commands = {
-      graph: {
-        usage: "Creates graphviz compatible graph output of nodes and edges. Saves to graph.out file.",
-        lifecycleEvents: [
-          'graph',
-        ],
-        options: {
-          horizontal: {
-            usage: 'Graph nodes from left to right instead of top down.'
-          },
-          edgelabels: {
-            usage: 'Display edgelabels in graph.',
-            shortcut: 'e',
-          }
-        }
-      }
-    };
-
-    this.hooks = {
-      'before:graph:graph': () => BbPromise.bind(this)
-      .then(() => {
-        if (!this.options.package && !this.serverless.service.package.path) {
-          return this.serverless.pluginManager.spawn('package');
-        }
-        return BbPromise.resolve();
-      }),
-
-      'graph:graph': () => BbPromise.bind(this)
-        .then(this.graph),
-    };
+    // this.commands = {
+    //   graph: {
+    //     usage: "Creates graphviz compatible graph output of nodes and edges. Saves to graph.out file.",
+    //     lifecycleEvents: [
+    //       'graph',
+    //     ],
+    //     options: {
+    //       horizontal: {
+    //         usage: 'Graph nodes from left to right instead of top down.'
+    //       },
+    //       edgelabels: {
+    //         usage: 'Display edgelabels in graph.',
+    //         shortcut: 'e',
+    //       }
+    //     }
+    //   }
+    // };
   }
 
-  graph() {
+  graph(incomingStringOrFile) {
     const currentDir = process.cwd();
-    const serverless = this.serverless;
+    let options = this.options;
+    let template;
 
-    var options = this.options;
+    // if we got a valid ABSOLUTE file path, read to incomingStringOrFile
+    if (fs.existsSync(incomingStringOrFile)) {
+      incomingStringOrFile = fs.readFileSync(incomingStringOrFile, 'utf8');
+    }
 
-    fs.readFile(`${currentDir}/.serverless/cloudformation-template-update-stack.json`, 'utf8', function(err, data) {
-      if (err) {
-        const errorMessage = [
-          `The file "cloudformation-template-update-stack.json" could not be opened.`,
-          `${err}`,
-        ].join('\n');
+    // if we got a valid relative file path, read to incomingStringOrFile
+    if (fs.existsSync(`${process.cwd()}/${incomingStringOrFile}`)) {
+      incomingStringOrFile = fs.readFileSync(`${process.cwd()}/${incomingStringOrFile}`, 'utf8');
+    }
 
-        throw new serverless.classes.Error(errorMessage);
+    // If JSON string and valid, pass right through
+    if (isJSON(incomingStringOrFile)) {
+      console.log('Processing incoming string as JSON');
+      template = JSON.parse(incomingStringOrFile);
+    }
+
+    // If valid yaml, pull to template object
+    if (!template.length > 0) {
+      try {
+        template = YAML.parse(incomingStringOrFile);
+      } catch (e) {
+        // If we get here, we have totally bombed out, fail
+        console.log('Failed to succesfully parse the template as JSON or YAML.');
+        return;
       }
+    }
 
-      const template = JSON.parse(data);
-      var obj = lib.extractGraph(template.Description, template.Resources, serverless)
-      var graph = obj.graph;
-      graph.edges = graph.edges.concat(obj.edges);
-      lib.handleTerminals(template, graph, 'Parameters', 'source')
-
-      serverless.cli.log("Rendering graph...");
-      lib.renderGraph(graph, options)
-      serverless.cli.log("Graph saved to graph.out.");
-    });
+    var obj = lib.extractGraph(template.Description, template.Resources, serverless)
+    var graph = obj.graph;
+    graph.edges = graph.edges.concat(obj.edges);
+    lib.handleTerminals(template, graph, 'Parameters', 'source')
+    lib.renderGraph(graph, options)
   }
 }
 
-module.exports = ServerlessGraph;
+module.exports = CloudFormationGraph;

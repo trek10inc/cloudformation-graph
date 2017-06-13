@@ -1,0 +1,11 @@
+#!/usr/bin/env node
+
+'use strict';
+
+const CloudFormationGraph = require('../index.js');
+
+process.on('unhandledRejection', (e) => {
+  console.error(e);
+});
+
+process.noDeprecation = true;

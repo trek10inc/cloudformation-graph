@@ -9,6 +9,14 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/trek10inc/cloudformation-graph"
+  },
   "author": "Trek10",
-  "license": "SEE LICENSE IN LICENSE.txt"
+  "license": "SEE LICENSE IN LICENSE.txt",
+  "dependencies": {
+    "is-valid-json": "^1.0.2",
+    "yamljs": "^0.2.10"
+  }
 }
