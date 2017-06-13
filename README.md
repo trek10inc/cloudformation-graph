@@ -6,7 +6,7 @@ This project was adapted from [CFVIZ](https://github.com/benbc/cloud-formation-v
 
 ### Example Output
 
-![Example Generated Graph](https://user-images.githubusercontent.com/1689118/27042562-5a36cd72-4f65-11e7-813f-c3bfa6326ca2.png)
+![Example Generated Graph](https://user-images.githubusercontent.com/1689118/27105864-1caad76e-505f-11e7-9521-dcc81a2a38ec.png)
 
 ### Why?
 
