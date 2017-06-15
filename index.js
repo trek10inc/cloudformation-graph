@@ -10,7 +10,7 @@ const path = require('path'),
 class CloudFormationGraph {
   constructor(options) {
     this.options = {
-      horizontal: false,
+      horizontal: true,
       edgelabels: false
     };
 

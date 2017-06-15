@@ -36,6 +36,10 @@ if (process.argv.join('~~').indexOf('~~--h') >= 0 || process.argv.join('~~').ind
   options.horizontal = true;
 };
 
+if (process.argv.join('~~').indexOf('~~--vertical') >= 0 || process.argv.join('~~').indexOf('~~-v') >= 0) {
+  options.horizontal = false;
+};
+
 if (process.argv.join('~~').indexOf('~~--e') >= 0 || process.argv.join('~~').indexOf('~~-e') >= 0) {
   options.edgelabels = true;
 };
