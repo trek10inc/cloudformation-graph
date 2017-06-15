@@ -1,8 +1,6 @@
-# Serverless Graph
+# CloudFormation Graph
 
 This project was adapted from [CFVIZ](https://github.com/benbc/cloud-formation-viz/blob/master/cfviz). Serverless Graph outputs your serverless architecture and resources as a [Graphviz](http://www.graphviz.org/) dot compatible output. Currently only supports the AWS provider.
-
-**Note:** Serverless *v1.x.x* or higher is required.
 
 ### Example Output
 
@@ -13,14 +11,13 @@ This project was adapted from [CFVIZ](https://github.com/benbc/cloud-formation-v
 Sometimes this is the fastest way to just visualize everything going on, it can also be extremely helpful in debugging circular dependency issues in CloudFormation templates.
 
 ### Get Started
-* `npm install --save serverless-graph`
+* `npm install --save cloudformation-graph`
 * Install graphviz
   * Homebrew - brew install graphviz
-* Add serverless-graph to the plugins section of your serverless.yml
 
 ### Run
 If you have any commandline params that don't have defaults you will have to pass in any opt variables as this plugin hooks into the package step and then reads the output.
-* `sls graph {--opts}`
+* `cfn-graph {--opts} > graph.out`
 * Output SVG
   * `cat graph.out | dot -Tsvg -oexample.svg`
 * Output PNG
@@ -30,8 +27,20 @@ If you have any commandline params that don't have defaults you will have to pas
 ### Options (--help)
 
 ```
-Plugin: ServerlessGraph
-graph ......................... Creates graphviz compatible graph output of nodes and edges. Saves to graph.out file.
-    --horizontal ....................... Graph nodes from left to right instead of top down.
-    --edgelabels / -e .................. Display edgelabels in graph.
+CloudFormation Graph
+============================================================
+Usage Examples:
+
+cfn-grah path-to-file.json [--horizontal|-h] [--edgelabels|-e]
+cfn-graph 'VALID_JSON_TEMPALTE' [--horizontal|-h] [--edgelabels|-e]
+
+# IT IS A KNOWN PROBLEM THAT !Sub or !Ref syntax is not supported
+cfn-grah path-to-file.yaml     (expiremental) [--horizontal|-h] [--edgelabels|-e]
+cfn-graph 'VALID_YML_TEMPLATE' (expiremental) [--horizontal|-h] [--edgelabels|-e]
+
+cat template.json | cfg [--horizontal|-h] [--edgelabels|-e]
 ```
+
+# Using the Serverless Framework?
+
+We already bundled this as a plugin for Serverless, checkout [https://github.com/trek10inc/serverless-graph](https://github.com/trek10inc/serverless-graph).
