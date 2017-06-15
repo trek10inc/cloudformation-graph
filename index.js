@@ -11,6 +11,7 @@ class CloudFormationGraph {
   constructor(options) {
     this.options = {
       horizontal: true,
+      clarity: false,
       edgelabels: false
     };
 

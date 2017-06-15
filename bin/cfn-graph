@@ -44,6 +44,10 @@ if (process.argv.join('~~').indexOf('~~--e') >= 0 || process.argv.join('~~').ind
   options.edgelabels = true;
 };
 
+if (process.argv.join('~~').indexOf('~~--clarity') >= 0 || process.argv.join('~~').indexOf('~~-c') >= 0) {
+  options.clarity = true;
+};
+
 // parse options
 const cfg = new CloudFormationGraph(options);
 
