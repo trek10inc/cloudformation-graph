@@ -17,8 +17,8 @@
   "license": "SEE LICENSE IN LICENSE.txt",
   "dependencies": {
     "bluebird": "^3.5.0",
-    "is-valid-json": "^1.0.2",
-    "yamljs": "^0.2.10",
+    "cloudformation-schema-js-yaml": "^1.0.0",
+    "js-yaml": "^3.8.4",
     "lodash": "^4.17.4"
   },
   "bin": {

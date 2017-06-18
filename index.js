@@ -1,11 +1,11 @@
 'use strict';
 
-const path = require('path'),
-  fs = require('fs'),
-  BbPromise = require('bluebird'),
-  lib = require('./lib'),
-  _ = require('lodash'),
-  isJSON = require('is-valid-json');
+const path      = require('path');
+const fs        = require('fs');
+const BbPromise = require('bluebird');
+const lib       = require('./lib');
+const yaml      = require('js-yaml');
+const schema    = require('cloudformation-schema-js-yaml');
 
 class CloudFormationGraph {
   constructor(options) {
@@ -15,7 +15,7 @@ class CloudFormationGraph {
       edgelabels: false
     };
 
-    _.merge(this.options, options)
+    Object.assign(this.options, options)
     // this.commands = {
     //   graph: {
     //     usage: "Creates graphviz compatible graph output of nodes and edges. Saves to graph.out file.",
@@ -50,20 +50,16 @@ class CloudFormationGraph {
       incomingStringOrFile = fs.readFileSync(`${process.cwd()}/${incomingStringOrFile}`, 'utf8');
     }
 
-    // If JSON string and valid, pass right through
-    if (isJSON(incomingStringOrFile)) {
-      template = JSON.parse(incomingStringOrFile);
-    }
-
-    // If valid yaml, pull to template object
-    if (!template) {
-      try {
-        template = YAML.parse(incomingStringOrFile);
-      } catch (e) {
-        // If we get here, we have totally bombed out, fail
-        console.log('Failed to succesfully parse the template as JSON or YAML.');
-        return;
+    // JSON is yaml, just use yaml
+    try {
+      template = yaml.safeLoad(incomingStringOrFile, {schema: schema });
+      if (template === incomingStringOrFile) {
+        throw new Error('Input is just a string')
       }
+    } catch (e) {
+      // If we get here, we have totally bombed out, fail
+      console.log('Failed to succesfully parse the template as JSON or YAML.');
+      return;
     }
 
     var obj = lib.extractGraph(template.Description, template.Resources)
