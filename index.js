@@ -2,10 +2,10 @@
 
 const path = require('path'),
   fs = require('fs'),
-  BbPromise = require('bluebird'),
   lib = require('./lib'),
   _ = require('lodash'),
-  isJSON = require('is-valid-json');
+  yaml = require('js-yaml'),
+  schema = require('cloudformation-schema-js-yaml');
 
 class CloudFormationGraph {
   constructor(options) {
@@ -16,23 +16,6 @@ class CloudFormationGraph {
     };
 
     _.merge(this.options, options)
-    // this.commands = {
-    //   graph: {
-    //     usage: "Creates graphviz compatible graph output of nodes and edges. Saves to graph.out file.",
-    //     lifecycleEvents: [
-    //       'graph',
-    //     ],
-    //     options: {
-    //       horizontal: {
-    //         usage: 'Graph nodes from left to right instead of top down.'
-    //       },
-    //       edgelabels: {
-    //         usage: 'Display edgelabels in graph.',
-    //         shortcut: 'e',
-    //       }
-    //     }
-    //   }
-    // };
   }
 
   graph(incomingStringOrFile) {
@@ -50,20 +33,13 @@ class CloudFormationGraph {
       incomingStringOrFile = fs.readFileSync(`${process.cwd()}/${incomingStringOrFile}`, 'utf8');
     }
 
-    // If JSON string and valid, pass right through
-    if (isJSON(incomingStringOrFile)) {
-      template = JSON.parse(incomingStringOrFile);
-    }
-
-    // If valid yaml, pull to template object
-    if (!template) {
-      try {
-        template = YAML.parse(incomingStringOrFile);
-      } catch (e) {
-        // If we get here, we have totally bombed out, fail
-        console.log('Failed to succesfully parse the template as JSON or YAML.');
-        return;
-      }
+    // If valid yaml, pull to template object, JSON is yaml so just use yaml parser
+    try {
+      template = yaml.safeLoad(incomingStringOrFile, { schema });
+    } catch (e) {
+      // If we get here, we have totally bombed out, fail
+      console.log('Failed to succesfully parse the template as JSON or YAML.');
+      return;
     }
 
     var obj = lib.extractGraph(template.Description, template.Resources)

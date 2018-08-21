@@ -1,6 +1,6 @@
 {
   "name": "cloudformation-graph",
-  "version": "1.1.3",
+  "version": "1.2.0",
   "description": "Generate dot files for GraphViz from an AWS CloudFormation template.",
   "main": "index.js",
   "directories": {
@@ -16,10 +16,10 @@
   "author": "Trek10",
   "license": "SEE LICENSE IN LICENSE.txt",
   "dependencies": {
-    "bluebird": "^3.5.0",
+    "cloudformation-schema-js-yaml": "^1.0.1",
     "is-valid-json": "^1.0.2",
-    "yamljs": "^0.2.10",
-    "lodash": "^4.17.4"
+    "js-yaml": "^3.12.0",
+    "lodash": "^4.17.10"
   },
   "bin": {
     "cloudformation-graph": "./bin/cfn-graph",
